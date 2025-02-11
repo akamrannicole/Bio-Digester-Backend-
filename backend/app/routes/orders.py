@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import Order, Receipt, User
 from app.schemas import OrderSchema, ReceiptSchema
 from app import db
-from app.mpesa_config import mpesa_express
+from app.mpesa_config import mpesa_api
 from datetime import datetime
 
 bp = Blueprint('orders', __name__, url_prefix='/orders')
@@ -25,7 +25,7 @@ def create_order():
     
     # Initiate M-PESA payment
     try:
-        response = mpesa_express.stk_push(
+        response = mpesa_api.stk_push(
             phone_number=data['phone_number'],
             amount=data['total_amount'],
             callback_url="https://your-callback-url.com/mpesa-callback",
