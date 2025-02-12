@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import Order, Receipt, User
 from app.schemas import OrderSchema, ReceiptSchema
@@ -25,10 +25,11 @@ def create_order():
     
     # Initiate M-PESA payment
     try:
-        response = mpesa_api.stk_push(
+        callback_url = f"{request.url_root.rstrip('/')}/orders/mpesa-callback"
+        response = mpesa_api.initiate_payment(
             phone_number=data['phone_number'],
             amount=data['total_amount'],
-            callback_url="https://your-callback-url.com/mpesa-callback",
+            callback_url=callback_url,
             account_reference=f"Order-{new_order.id}",
             transaction_desc=f"Payment for Order {new_order.id}"
         )
