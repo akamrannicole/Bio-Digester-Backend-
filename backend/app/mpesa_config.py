@@ -8,6 +8,8 @@ class MpesaAPI:
         self.base_url = Config.MPESA_BASE_URL
         self.consumer_key = Config.MPESA_CONSUMER_KEY
         self.consumer_secret = Config.MPESA_CONSUMER_SECRET
+        self.business_number = Config.MPESA_BUSINESS_NUMBER
+        self.account_number = Config.MPESA_ACCOUNT_NUMBER
         self.access_token = None
 
     def get_access_token(self):
@@ -23,7 +25,7 @@ class MpesaAPI:
         else:
             raise Exception("Failed to get access token")
 
-    def stk_push(self, phone_number, amount, callback_url, account_reference, transaction_desc):
+    def initiate_payment(self, phone_number, amount, callback_url, account_reference, transaction_desc):
         if not self.access_token:
             self.get_access_token()
 
@@ -33,19 +35,19 @@ class MpesaAPI:
             "Content-Type": "application/json"
         }
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        password = base64.b64encode(f"{Config.MPESA_BUSINESS_SHORT_CODE}{Config.MPESA_PASSKEY}{timestamp}".encode()).decode()
+        password = base64.b64encode(f"{self.business_number}{Config.MPESA_PASSKEY}{timestamp}".encode()).decode()
         
         data = {
-            "BusinessShortCode": Config.MPESA_BUSINESS_SHORT_CODE,
+            "BusinessShortCode": self.business_number,
             "Password": password,
             "Timestamp": timestamp,
             "TransactionType": "CustomerPayBillOnline",
             "Amount": amount,
             "PartyA": phone_number,
-            "PartyB": Config.MPESA_BUSINESS_SHORT_CODE,
+            "PartyB": self.business_number,
             "PhoneNumber": phone_number,
             "CallBackURL": callback_url,
-            "AccountReference": account_reference,
+            "AccountReference": self.account_number,
             "TransactionDesc": transaction_desc
         }
 
