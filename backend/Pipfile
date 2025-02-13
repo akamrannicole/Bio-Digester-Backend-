@@ -12,6 +12,7 @@ flask-migrate = "*"
 flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
 requests = "*"
+flask-cors = "*"
 
 [dev-packages]
 
